@@ -16,12 +16,12 @@ def get_detail(url):
     assert page.status_code == 200
     soup = BeautifulSoup(page.content, 'lxml')
 
-    title = soup.find('span', attrs={
-        'id': 'productTitle'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
+    title = soup.find('h1', attrs={
+        'data-test': 'product-title'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
 
     try:
-        current_price = soup.find('span', attrs={'class': 'a-price a-text-price a-size-medium apexPriceToPay'}).find(
-            'span', attrs={'class': 'a-offscreen'}).text.strip()
+        current_price = soup.find('div', attrs={'class': 'h-text-red'}).find(
+            'span', attrs={'data-test': 'product-price'}).text.strip()
     except AttributeError:
         current_price = ''
     except AttributeError:
