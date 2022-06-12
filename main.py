@@ -39,4 +39,5 @@ def get_detail(url):
     return result
 
 
-get_detail('https://www.amazon.com/dp/B085RQYX5Z/%27')
+url = input("Enter the product URL: ")
+get_detail(url)
