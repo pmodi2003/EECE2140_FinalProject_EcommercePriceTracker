@@ -15,25 +15,32 @@ def get_detail(url):
     page = requests.get(url, headers=header)
     assert page.status_code == 200
     soup = BeautifulSoup(page.content, 'lxml')
+    #
+    # title = soup.find('h1', attrs={
+    #     'data-test': 'product-title'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
+    #
+    # try:
+    #     current_price = soup.find('span', attrs={'data-test': "product-price"}).text.strip()
+    # except AttributeError:
+    #     current_price = 'Attribute ERROR'
+    #
+    # goal = {
+    #     'title': title,
+    #     'price': current_price,
+    # }
+    # print(goal)
+    #
+    # result.append(goal)
+    # return result
+    s = soup.select_one('script[type="application/ld+json"]')
+    data = json.loads(s.text)
+    data = data['@graph']
+    data = data[0]
 
-    title = soup.find('h1', attrs={
-        'data-test': 'product-title'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
-
-    try:
-        current_price = soup.find('div', attrs={'class': 'h-text-red'}).find(
-            'span', attrs={'data-test': 'product-price'}).text.strip()
-    except AttributeError:
-        current_price = ''
-    except AttributeError:
-        sv_feature = ''
-    data = soup.select(
-        "#imageBlock_feature_div > script:nth-child(2)")  # using selector, right click > copy > copy selector
-
-    goal = {
-        'title': title,
-        'price': current_price,
-    }
-    print(goal)
-
-    result.append(goal)
-    return result
+    for key, value in data.items():
+        if key == 'name':
+            print(key, ": ", value)
+        elif key == 'offers':
+            for keys, values in data['offers'].items():
+                if keys == 'price':
+                    print(keys, ": ${:.2f}".format(float(values)))
