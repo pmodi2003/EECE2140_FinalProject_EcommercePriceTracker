@@ -14,25 +14,15 @@ def get_detail(url):
 
     page = requests.get(url, headers=header)
     assert page.status_code == 200
-    soup = BeautifulSoup(page.content, 'lxml')
+    soup = BeautifulSoup(page.content, 'html.parser')
 
-    s = soup.select_one('script[type="application/ld+json"]')
-    data = json.loads(s.text)
-    data = data['@graph']
-    data = data[0]
+    data = json.loads(page.text)
+    print(data['items'])
 
     goal = {
         'title': None,
         'price': None,
     }
-
-    for key, value in data.items():
-        if key == 'name':
-            goal['title'] = value
-        elif key == 'offers':
-            for keys, values in data['offers'].items():
-                if keys == 'price':
-                    goal['price'] = ": ${:.2f}".format(float(values))
 
     print(goal)
 

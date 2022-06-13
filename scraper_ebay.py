@@ -16,14 +16,20 @@ def get_detail(url):
     assert page.status_code == 200
     soup = BeautifulSoup(page.content, 'lxml')
 
-    title = soup.find('span', attrs={
-        'id': 'productTitle'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
+    title = soup.find('h1', attrs={
+        'class': 'x-item-title__mainTitle'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
 
     try:
-        current_price = soup.find('span', attrs={'class': 'a-price a-text-price a-size-medium apexPriceToPay'}).find(
-            'span', attrs={'class': 'a-offscreen'}).text.strip()
+        current_price = soup.find('div', attrs={'class': 'mainPrice'}).text.strip().translate(
+            (str.maketrans(" ", " ", "US/ea")))
+
     except AttributeError:
         current_price = ''
+
+    except AttributeError:
+        sv_feature = ''
+    data = soup.select(
+        "#imageBlock_feature_div > script:nth-child(2)")  # using selector, right click > copy > copy selector
 
     goal = {
         'title': title,
