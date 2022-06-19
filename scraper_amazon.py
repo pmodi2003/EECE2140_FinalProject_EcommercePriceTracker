@@ -27,7 +27,7 @@ def get_detail(url):
 
     goal = {
         'title': title,
-        'price': current_price,
+        'price': current_price
     }
     print(goal)
 

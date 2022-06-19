@@ -25,14 +25,19 @@ def get_detail(url):
                                                                                                                     'aria-hidden': 'true'}).text.strip()
     except AttributeError:
         current_price = ''
+
+    try:
+        current_price += soup.find('div', attrs={'class': 'priceView-hero-price priceView-customer-price'}).find('span',
+                                                                                                                 attrs={
+                                                                                                                     'class': 'priceView-subscription-units'}).text.strip()
     except AttributeError:
-        sv_feature = ''
-    data = soup.select(
-        "#imageBlock_feature_div > script:nth-child(2)")  # using selector, right click > copy > copy selector
+        current_price = soup.find('div', attrs={'class': 'priceView-hero-price priceView-customer-price'}).find('span',
+                                                                                                                attrs={
+                                                                                                                    'aria-hidden': 'true'}).text.strip()
 
     goal = {
         'title': title,
-        'price': current_price,
+        'price': current_price
     }
     print(goal)
 

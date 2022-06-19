@@ -16,24 +16,18 @@ def get_detail(url):
     assert page.status_code == 200
     soup = BeautifulSoup(page.content, 'lxml')
 
-    s = soup.select_one('script[type="application/ld+json"]')
-    data = json.loads(s.text)
-    data = data['@graph']
-    data = data[0]
+    title = soup.find('h1', attrs={
+        'data-test': 'product-title'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
+
+    try:
+        current_price = soup.find('div', attrs={'class': "h-text-red"}).find('span', attrs={'data-test': 'product-price'}).text.strip()
+    except AttributeError:
+        current_price = ''
 
     goal = {
-        'title': None,
-        'price': None,
+        'title': title,
+        'price': current_price
     }
-
-    for key, value in data.items():
-        if key == 'name':
-            goal['title'] = value
-        elif key == 'offers':
-            for keys, values in data['offers'].items():
-                if keys == 'price':
-                    goal['price'] = ": ${:.2f}".format(float(values))
-
     print(goal)
 
     result.append(goal)
