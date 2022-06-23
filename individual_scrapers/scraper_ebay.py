@@ -1,9 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import json
-import re
-
-result = []
 
 
 def get_detail(url):
@@ -16,19 +12,20 @@ def get_detail(url):
     assert page.status_code == 200
     soup = BeautifulSoup(page.content, 'lxml')
 
-    title = soup.find('h1', attrs={
-        'data-test': 'product-title'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
+    try:
+        title = soup.find('h1', attrs={'class': 'x-item-title__mainTitle'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
+    except AttributeError:
+        title = ''
 
     try:
-        current_price = soup.find('div', attrs={'class': "h-text-red"}).find('span', attrs={'data-test': 'product-price'}).text.strip()
+        current_price = soup.find('div', attrs={'class': 'mainPrice'}).text.strip().translate((str.maketrans(" ", " ", "US/ea"))).replace(" ", "")
+
     except AttributeError:
         current_price = ''
 
     goal = {
-        'title': title,
-        'price': current_price
+        'Title': title,
+        'Price': current_price,
+        'URL': url
     }
-    print(goal)
-
-    result.append(goal)
-    return result
+    return goal
