@@ -12,7 +12,8 @@ from price_notifications import Notifications
 def track_products(interval_count=1, interval_hours=6):
     """
     This function reads the TRACKER_PRODUCTS.csv file which have a url, notify below price, and recipient email on each line.
-    The function creates a Notifications object using the price tracker application email, which is the email that will send price alerts.
+    The function creates a Notifications object using the price tracker application email,
+    which is the email that will send price alerts.
     The function scrapes each of the URLs for the updated price and writes the details to a SEARCH_HISTORY excel sheet.
     A new, updated excel sheet is created with each call of the function
     :param interval_count: defaults to 1

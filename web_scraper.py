@@ -10,9 +10,9 @@ class Web_Scraper:  # Creates the WebScraper class that will be used to make Web
     - get_source(self) is used to get HTML content from Web_Scraper objects with their own defined google search URL
     - get_outside_source(self, url) is used to get HTML content from Web_Scraper objects with inputted URLs
         -- currently used by individual scrapers such as the scraper_amazon, scraper_bestbuy, and scraper_ebay scripts
-    - search_url(self, product) is used to set the google search url using the product and urllib library for correct url parsing
+    - search_url(self, product) is used to set the Google search url using the product and urllib library for correct url parsing
     - get_details(self, product) is used to compare prices of the inputted product by scraping various
-        sites' information from google shopping
+        sites' information from Google shopping
     """
 
     def __init__(self):
