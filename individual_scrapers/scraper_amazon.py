@@ -1,16 +1,16 @@
 import requests
 from bs4 import BeautifulSoup
+from web_scraper import Web_Scraper
 
 
 def get_detail(url):
-    header = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.115 Safari/537.36',
-        'Accept-Language': 'en-US,en;q=0.9'
-    }
-
-    page = requests.get(url, headers=header)
-    assert page.status_code == 200
-    soup = BeautifulSoup(page.content, 'lxml')
+    """
+    This function gets an Amazon url and scrapes the amazon product page for the title and price
+    :param url: string url of the amazon product page
+    :return: dictionary containing scraped product details
+    """
+    scraper = Web_Scraper()
+    soup = scraper.get_outside_source(url)
 
     try:
         title = soup.find('span', attrs={'id': 'productTitle'}).text.strip()  # to get the text, and strip is used to remove all the leading and trailing spaces from a string.
