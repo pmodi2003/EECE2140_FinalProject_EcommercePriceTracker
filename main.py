@@ -2,6 +2,7 @@ from web_scraper import Web_Scraper
 import price_history
 import PySimpleGUI as sg
 import webbrowser
+import email_validator
 
 # Set Theme of Graphical User Interface(GUI)
 sg.theme('DarkGrey13')
@@ -32,11 +33,18 @@ while True:  # Puts user into infinite loop in GUI window 1 in order to wait unt
         # shopping details for the product the user input
         break  # Breaks out of the while loop once the product details have been received
     elif event == "Notify!":  # If Notify! button is pressed on GUI
-        price_history.update_tracker_list(values['url'], values['notify_below'], values['recipient'])
-        # TRACKER_PRODUCTS.csv is updated with a new line containing the product url, notify below price, and recipient email
-        # The track_products function is also run with the call on the update_tracker_list function
-        window.close()  # Closes the GUI window
-        break  # Breaks out of the while loop once the windows has been closed
+        try:
+            email_validator.validate_email(values['recipient'], check_deliverability=True)
+            # Checks to see if entered recipient email is valid
+            price_history.update_tracker_list(values['url'], values['notify_below'], values['recipient'])
+            # TRACKER_PRODUCTS.csv is updated with a new line containing the product url, notify below price, and recipient email
+            # The track_products function in price_history.py is also run with the call on the update_tracker_list function
+            window.close()  # Closes the GUI window
+            break  # Breaks out of the while loop once the windows has been closed
+        except email_validator.EmailNotValidError:
+            sg.popup_ok("Recipient Email Address is Invalid!")
+            window['recipient'].update(value='')
+            continue
     elif event == sg.WIN_CLOSED or event == 'Exit':  # If Exit button is pressed on GUI or GUI window is closed
         window.close()  # Window is properly closed in the program
         break  # Breaks out of the while loop once the windows has been closed
@@ -46,7 +54,7 @@ if not window.is_closed():  # GUI window 2 is created only if window 1 was not c
     # This is only possible if the "Ok" button was pressed as the window is closed by the "Notify!" and "Exit" buttons
     layout = [[sg.Text('ECommerce Price Tracker', font=('Courier New', 30))],  # GUI Title
               [sg.Text(product.capitalize(), font=('Courier New', 18), text_color='Purple')],  # Prints the Product Name on GUI window 2
-              [[sg.Text((i['Website']), enable_events=True, text_color='Cyan', font=('Courier New', 12, 'underline'), key=f'URL {i["URL"]}'),
+              [[sg.Text((i['Website']), enable_events=True, tooltip=i['Title'], text_color='Cyan', font=('Courier New', 12, 'underline'), key=f'URL {i["URL"]}'),
                 sg.Push(),
                 sg.Text((i['Price']), enable_events=True, text_color='Cyan', font=('Courier New', 12), key=f'URL {i["URL"]}')]
                for i in scraped_items],

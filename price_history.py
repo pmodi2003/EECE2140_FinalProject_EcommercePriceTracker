@@ -27,6 +27,9 @@ def track_products(interval_count=1, interval_hours=6):
 
     alert = Notifications('eece2140.pricetracker@gmail.com', 'tgqhusfplradiaxl')
 
+    last_search = glob('search_history/*.xlsx')[-1]  # path to file in the folder'
+    search_hist = pd.read_excel(last_search)
+
     while interval < interval_count:
 
         for x, url in enumerate(tracker_products_links):
@@ -44,9 +47,15 @@ def track_products(interval_count=1, interval_hours=6):
             log = pd.DataFrame(data, index=[x])
 
             try:
+                change = price_change(search_hist, data)  # Calculate the price change from the last run.
                 # An email is sent if the current price is less than the notify_below price the user inputted earlier
+                # Email is also sent if the price has increased or decreased
                 if float(data['Price'].replace("$", "")) <= float(tracker_products.notify_below[x]):
-                    alert.send_price_alert(data, tracker_products.recipient[x])
+                    alert.send_price_alert(data, tracker_products.recipient[x], change, 'notify below')
+                elif float(change.replace('%', '')) < 0:
+                    alert.send_price_alert(data, tracker_products.recipient[x], change, 'price decrease')
+                elif float(change.replace('%', '')) > 0:
+                    alert.send_price_alert(data, tracker_products.recipient[x], change, 'price increase')
             except AttributeError:
                 # Catches the raised error if there is no price
                 pass
@@ -60,11 +69,10 @@ def track_products(interval_count=1, interval_hours=6):
         sleep(interval_hours * 1 * 1)
 
     # after the run, checks last search history record, and appends this run results to it, saving a new file
-    last_search = glob('search_history/*.xlsx')[-1]  # path to file in the folder
-    search_hist = pd.read_excel(last_search)
-    final_dataframe = search_hist.append(tracker_log, sort=False)
+    # final_dataframe = search_hist.append(tracker_log, sort=False)
 
-    final_dataframe.to_excel('search_history/SEARCH_HISTORY_{}.xlsx'.format(datetime.now().strftime('%m-%d-%Y %H-%M')), index=False)
+    tracker_log.to_excel('search_history/SEARCH_HISTORY_{}.xlsx'.format(datetime.now().strftime('%m-%d-%Y %H-%M')),
+                         index=False)
 
 
 def update_tracker_list(url, notify_below, recipient):
@@ -80,3 +88,17 @@ def update_tracker_list(url, notify_below, recipient):
     with open('TRACKER_PRODUCTS.csv', 'a') as f:
         f.write("\n" + url + ";" + notify_below + ";" + recipient)
     track_products()
+
+
+def price_change(previous_search, current_search):
+    """
+    This function calculates the price change of a product from the previous tracked price and the current price
+    :param previous_search: Last scraped data for the product
+    :param current_search: the most current scraped data for the product
+    :return: string containing the percent change of the price
+    """
+    for title, price in zip(previous_search['Title'], previous_search['Price']):
+        if title == current_search['Title']:
+            change = (float(current_search['Price'].replace('$', '')) - float(price.replace('$', ''))) / float(
+                price.replace('$', '')) * 100
+            return str(round(change, 1)) + '%'
