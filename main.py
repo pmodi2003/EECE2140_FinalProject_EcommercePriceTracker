@@ -1,5 +1,5 @@
 from web_scraper import Web_Scraper
-import price_history
+import price_tracker
 import PySimpleGUI as sg
 import webbrowser
 import email_validator
@@ -36,9 +36,9 @@ while True:  # Puts user into infinite loop in GUI window 1 in order to wait unt
         try:
             email_validator.validate_email(values['recipient'], check_deliverability=True)
             # Checks to see if entered recipient email is valid
-            price_history.update_tracker_list(values['url'], values['notify_below'], values['recipient'])
+            price_tracker.update_tracker_list(values['url'], values['notify_below'], values['recipient'])
             # TRACKER_PRODUCTS.csv is updated with a new line containing the product url, notify below price, and recipient email
-            # The track_products function in price_history.py is also run with the call on the update_tracker_list function
+            # The track_products function in price_tracker.py is also run with the call on the update_tracker_list function
             window.close()  # Closes the GUI window
             break  # Breaks out of the while loop once the windows has been closed
         except email_validator.EmailNotValidError:

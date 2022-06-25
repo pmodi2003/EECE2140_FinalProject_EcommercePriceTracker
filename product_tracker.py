@@ -1,4 +1,4 @@
-import price_history
+import price_tracker
 
 
-price_history.track_products()
+price_tracker.track_products()
